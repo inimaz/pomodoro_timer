@@ -1,15 +1,17 @@
 import time
 from tkinter import Tk, Label, Button
-from winsound import *
 
+from winsound import *
 
 WIDTH = 120
 HEIGHT = 50
+max_time = 25 * 60
 
 
 class PomodoroUI():
-    def __init__(self, master):
+    def __init__(self, master, max_time):
         self.master = master
+        self.max_time = max_time
         master.title("Pomodoro timer")
         master.minsize(width=WIDTH, height=HEIGHT)
         master.iconbitmap('images/favicon.ico')
@@ -36,54 +38,52 @@ class PomodoroUI():
         self.__draw_clock()
 
     def __pause(self):
-        '''
+        """
 
-        '''
+        """
         self.paused = True
         self.start_paused_time = time.time()
         self.main_button.config(
             text="Resume", bg='#22AB32', command=self.__resume)
 
     def __resume(self):
-        '''
-        '''
+        """
+        """
         self.end_paused_time = time.time()
         self.pause_time_in_sec = self.pause_time_in_sec + \
-            self.end_paused_time - self.start_paused_time
+                                 self.end_paused_time - self.start_paused_time
         self.paused = False
         self.main_button.config(
             text="Pause", bg='#ce2c2c', command=self.__pause)
 
     def __draw_clock(self):
-        '''
+        """
         Draw the time that is passing by.
         The time of the pomodoro is a countdown starting in 25 min
-        '''
-        max_time = 10  # 25 * 60
+        """
         pomodoro_time = max_time - \
-            (time.time() - self.start_time) + self.pause_time_in_sec
+                        (time.time() - self.start_time) + self.pause_time_in_sec
 
-        if not(self.paused):
+        if not (self.paused):
             if pomodoro_time > 0:
-                min = pomodoro_time // 60
+                minutes = pomodoro_time // 60
                 sec = pomodoro_time % 60
-
-            if pomodoro_time <= 0:
-                min = 0
+            else:
+                minutes = 0
                 sec = 0
                 self.out_of_time()
-            t = "%02d:%02d" % (min, sec)
+            t = "%02d:%02d" % (minutes, sec)
             self.clock.config(text=t)
 
-        if not(self.times_up):
-                # Call this function to update the clock every 200 ms
+        if not (self.times_up):
+            # Call this function to update the clock every 200 ms
             self.clock.after(200, self.__draw_clock)
 
     def out_of_time(self):
-        '''
+        """
         User is out of time. Displays sound and changes color of the button
         and clock
-        '''
+        """
         self.master.deiconify()
         PlaySound("sounds/start_timer.wav", SND_FILENAME)
         PlaySound("sounds/clock_alarm_electronic_beep.wav", SND_FILENAME)
@@ -94,5 +94,5 @@ class PomodoroUI():
 
 if __name__ == "__main__":
     root = Tk()
-    PomodoroUI(root)
+    PomodoroUI(root, max_time)
     root.mainloop()
